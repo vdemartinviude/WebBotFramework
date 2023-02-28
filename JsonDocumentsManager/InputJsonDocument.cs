@@ -1,4 +1,5 @@
 ﻿using Json.Path;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +13,23 @@ namespace JsonDocumentsManager;
 public class InputJsonDocument : IInputJsonDocument
 {
     public JsonDocument JsonDoc { get; set; }
+    public JToken JsonDoc2 { get; set; }
 
     public InputJsonDocument(string jsonFilePath)
     {
         string text = File.ReadAllText(jsonFilePath);
-        JsonDoc = JsonDocument.Parse(text);
+        //JsonDoc = JsonDocument.Parse(text);
+        JsonDoc2 = JToken.Parse(text);
     }
 
     public string GetStringData(JsonPath jsonPath)
     {
-        var matches = jsonPath.Evaluate(JsonDoc.RootElement).Matches;
-        if (matches == null || matches.Count == 0)
-            return String.Empty;
-        return matches![0].Value.ToString();
+        //string value = JsonDoc2.SelectToken("").
+        //var matches = jsonPath.Evaluate(JsonDoc.).Matches;
+        //if (matches == null || matches.Count == 0)
+        //    return String.Empty;
+        //return matches![0].Value.ToString();
+        return "";
     }
 
     public Task ReadJson(string jsonFilePath)
@@ -34,29 +39,30 @@ public class InputJsonDocument : IInputJsonDocument
 
     public string GetStringData(string jsonPath)
     {
-        var theJsonPath = JsonPath.Parse(jsonPath);
-        return GetStringData(theJsonPath);
+        return (string)JsonDoc2.SelectToken(jsonPath);
     }
 
     public double? GetDoubleData(string jsonPath)
     {
-        var theJsonPath = JsonPath.Parse(jsonPath);
-        var matches = theJsonPath.Evaluate(JsonDoc.RootElement).Matches;
-        if (matches!.Count == 0)
-        {
-            return null;
-        }
-        return matches[0].Value.GetDouble();
+        //var theJsonPath = JsonPath.Parse(jsonPath);
+        //var matches = theJsonPath.Evaluate(JsonDoc.RootElement).Matches;
+        //if (matches!.Count == 0)
+        //{
+        //    return null;
+        //}
+        //return matches[0].Value.GetDouble();
+        return 0;
     }
 
     public bool? GetBoolData(string jsonPath)
     {
-        var theJsonPath = JsonPath.Parse(jsonPath);
-        var matches = theJsonPath.Evaluate(JsonDoc.RootElement).Matches;
-        if (matches!.Count == 0)
-        {
-            return null;
-        }
-        return matches[0].Value.GetBoolean();
+        //var theJsonPath = JsonPath.Parse(jsonPath);
+        //var matches = theJsonPath.Evaluate(JsonDoc.RootElement).Matches;
+        //if (matches!.Count == 0)
+        //{
+        //    return null;
+        //}
+        //return matches[0].Value.GetBoolean();
+        return false;
     }
 }
