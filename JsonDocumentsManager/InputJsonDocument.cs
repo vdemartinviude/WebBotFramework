@@ -1,5 +1,4 @@
-﻿using Json.Path;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,24 +11,13 @@ namespace JsonDocumentsManager;
 
 public class InputJsonDocument : IInputJsonDocument
 {
-    public JsonDocument JsonDoc { get; set; }
-    public JToken JsonDoc2 { get; set; }
+    private JToken _JsonDocument { get; set; }
 
     public InputJsonDocument(string jsonFilePath)
     {
         string text = File.ReadAllText(jsonFilePath);
         //JsonDoc = JsonDocument.Parse(text);
-        JsonDoc2 = JToken.Parse(text);
-    }
-
-    public string GetStringData(JsonPath jsonPath)
-    {
-        //string value = JsonDoc2.SelectToken("").
-        //var matches = jsonPath.Evaluate(JsonDoc.).Matches;
-        //if (matches == null || matches.Count == 0)
-        //    return String.Empty;
-        //return matches![0].Value.ToString();
-        return "";
+        _JsonDocument = JToken.Parse(text);
     }
 
     public Task ReadJson(string jsonFilePath)
@@ -39,7 +27,7 @@ public class InputJsonDocument : IInputJsonDocument
 
     public string GetStringData(string jsonPath)
     {
-        return (string)JsonDoc2.SelectToken(jsonPath);
+        return (string)_JsonDocument.SelectToken(jsonPath);
     }
 
     public double? GetDoubleData(string jsonPath)
