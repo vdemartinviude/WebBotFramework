@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ public class UploadFileByInputSelectRequest : IRobotRequest
     public By? InputSelectBy { get; set; }
     public string? FilePath { get; set; }
     public CancellationToken? CancellationToken { get; set; }
+    public ILogger<Robot>? logger { get; set; }
 
     public RobotResponse Exec(IWebDriver driver)
     {

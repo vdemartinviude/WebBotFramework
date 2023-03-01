@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ public class SetTextWithKeyDownRequest : IRobotRequest
     public string? Text { get; set; }
     public TimeSpan? Timeout { get; set; }
     public CancellationToken? CancellationToken { get; set; }
+    public ILogger<Robot>? logger { get; set; }
 
     public RobotResponse Exec(IWebDriver driver)
     {

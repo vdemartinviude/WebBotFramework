@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using TheRobot.Response;
 
@@ -15,6 +16,7 @@ public class SetTextRequest : IRobotRequest
     public TimeSpan? Timeout { get; set; }
     public bool? ClearBefore { get; set; }
     public CancellationToken? CancellationToken { get; set; }
+    public ILogger<Robot>? logger { get; set; }
 
     public RobotResponse Exec(IWebDriver driver)
     {

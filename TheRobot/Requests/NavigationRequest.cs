@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ public class NavigationRequest : IRobotRequest
     public Action<IWebDriver>? PostExecute { get; set; }
     public TimeSpan? Timeout { get; set; }
     public CancellationToken? CancellationToken { get; set; }
+    public ILogger<Robot>? logger { get; set; }
 
     public RobotResponse Exec(IWebDriver driver)
     {

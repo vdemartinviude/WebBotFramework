@@ -21,7 +21,7 @@ public class RobotFixtures : IDisposable
     public RobotFixtures()
     {
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.File("/logs/robtotest.log")
+            .WriteTo.File("logs/robtotest.log")
             .CreateLogger();
 
         IHost host = Host.CreateDefaultBuilder()

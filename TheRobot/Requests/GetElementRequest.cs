@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TheRobot.Response;
 using OpenQA.Selenium.Support.UI;
+using Microsoft.Extensions.Logging;
 
 namespace TheRobot.Requests;
 
@@ -19,6 +20,7 @@ public class GetElementRequest : IRobotRequest
     public TimeSpan? Timeout { get; set; }
     public By? By { get; set; }
     public CancellationToken? CancellationToken { get; set; }
+    public ILogger<Robot>? logger { get; set; }
 
     public RobotResponse Exec(IWebDriver driver)
     {

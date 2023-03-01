@@ -24,30 +24,6 @@ namespace TheRobot
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
-            var Processes = Process.GetProcesses();
-
-            Processes.Where(p => p.ProcessName.ToLower().Contains("chrome")).ToList().ForEach(x => x.Kill());
-
-            DownloadFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "RobotDownloads");
-            if (!Directory.Exists(DownloadFolder))
-            {
-                Directory.CreateDirectory(DownloadFolder);
-            }
-
-            new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
-            ChromeOptions options = new();
-
-            options.AddUserProfilePreference("download.prompt_for_download", false);
-            options.AddUserProfilePreference("download.default_directory", DownloadFolder);
-            options.AddArgument("--log-level=OFF");
-            options.AddExcludedArgument("enable-logging");
-
-            _logger.LogInformation("Starting the selenium driver");
-
-            _driver = new ChromeDriver(options);
-
-            _driver.Manage().Window.Maximize();
-            _logger.LogInformation("Selenium driver started");
         }
 
         public void Dispose()
