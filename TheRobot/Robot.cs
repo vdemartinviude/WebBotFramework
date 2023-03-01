@@ -2,13 +2,13 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Chromium;
-using Serilog;
 using System.Diagnostics;
 using TheRobot.Requests;
 using TheRobot.Response;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using WebDriverManager.Helpers;
+using Microsoft.Extensions.Logging;
 
 namespace TheRobot
 {
@@ -16,12 +16,14 @@ namespace TheRobot
     {
         private IWebDriver _driver { get; set; }
         private IHttpClientFactory _httpClientFactory { get; set; }
+        private readonly ILogger<Robot> _logger;
 
         public string DownloadFolder { get; private set; }
 
-        public Robot(IHttpClientFactory httpClientFactory)
+        public Robot(IHttpClientFactory httpClientFactory, ILogger<Robot> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
             var Processes = Process.GetProcesses();
 
             Processes.Where(p => p.ProcessName.ToLower().Contains("chrome")).ToList().ForEach(x => x.Kill());
@@ -31,12 +33,6 @@ namespace TheRobot
             {
                 Directory.CreateDirectory(DownloadFolder);
             }
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File("logs/therobot.log", rollingInterval: RollingInterval.Day)
-                .WriteTo.Console()
-
-                .CreateLogger();
 
             new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
             ChromeOptions options = new();
@@ -46,12 +42,12 @@ namespace TheRobot
             options.AddArgument("--log-level=OFF");
             options.AddExcludedArgument("enable-logging");
 
-            Log.Logger.Information("Starting the selenium driver");
+            _logger.LogInformation("Starting the selenium driver");
 
             _driver = new ChromeDriver(options);
 
             _driver.Manage().Window.Maximize();
-            Log.Logger.Information("Selenium driver started");
+            _logger.LogInformation("Selenium driver started");
         }
 
         public void Dispose()
@@ -71,7 +67,7 @@ namespace TheRobot
                 request.Timeout = TimeSpan.FromSeconds(5);
             }
 
-            Log.Information("About to execute {@IRoboRequest}", request);
+            _logger.LogInformation("About to execute {@IRoboRequest}", request);
             RobotResponse response = new();
 
             try
@@ -92,7 +88,7 @@ namespace TheRobot
 
                 if (response.Status != RobotResponseStatus.ActionRealizedOk)
                 {
-                    Log.Information("The request was not successfully");
+                    _logger.LogInformation("The request was not successfully");
                 }
 
                 if (request.DelayAfter.Ticks > 0)
@@ -104,18 +100,18 @@ namespace TheRobot
             }
             catch (Exception ex) when (ExecuteExceptionFilter(ex))
             {
-                Log.Information("An exception was thrown in the request execution.\nThe exception: {@Exception}", ex);
+                _logger.LogInformation("An exception was thrown in the request execution.\nThe exception: {@Exception}", ex);
                 response.Status = RobotResponseStatus.ExceptionOccurred;
                 response.ErrorMessage = ex.Message;
             }
             catch (WebDriverException ex)
             {
-                Log.Error("An critical exception occurs at the robot driver.\nThe exception: {@Exception}", ex);
+                _logger.LogError("An critical exception occurs at the robot driver.\nThe exception: {@Exception}", ex);
                 response.Status = RobotResponseStatus.ExceptionOccurred;
                 response.ErrorMessage = ex.Message;
             }
 
-            Log.Information("{@IRoboRequest} Executed", request);
+            _logger.LogInformation("{@IRoboRequest} Executed", request);
             return response;
         }
 
