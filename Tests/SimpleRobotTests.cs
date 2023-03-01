@@ -1,5 +1,7 @@
 using RobotTests.Fixtures;
 using TheRobot.Requests;
+using TheRobot.WebBotRequests;
+using TheRobot.WebRequestsParameters;
 
 namespace RobotTests;
 
@@ -19,8 +21,11 @@ public class SimpleRobotTests : IClassFixture<RobotFixtures>
     }
 
     [Fact]
-    public async Task EnsureRobotCanStartAsync()
+    public void AssureRobotCanNavigate()
     {
-        await robotFixtures.Robot.Execute(new InitializeBrowserRequest());
+        robotFixtures.Robot.Exec2(new WBR_NavigateRequest(), new NavigateRequestParameters
+        {
+            Url = "http://www.uol.com.br"
+        });
     }
 }

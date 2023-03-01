@@ -9,6 +9,8 @@ using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using WebDriverManager.Helpers;
 using Microsoft.Extensions.Logging;
+using TheRobot.WebBotInterfaces;
+using TheRobot.WebRequestsParameters;
 
 namespace TheRobot
 {
@@ -24,6 +26,21 @@ namespace TheRobot
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
+
+            new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+            ChromeOptions options = new();
+
+            options.AddUserProfilePreference("download.prompt_for_download", false);
+            //options.AddUserProfilePreference("download.default_directory", DownloadFolder);
+            options.AddArgument("--log-level=OFF");
+            options.AddExcludedArgument("enable-logging");
+
+            logger!.LogInformation("Starting the selenium driver");
+
+            _driver = new ChromeDriver(options);
+
+            _driver.Manage().Window.Maximize();
+            logger!.LogInformation("Selenium driver started");
         }
 
         public void Dispose()
@@ -86,6 +103,11 @@ namespace TheRobot
 
             _logger.LogInformation("{@IRoboRequest} Executed", request);
             return response;
+        }
+
+        public void Exec2(IWebBotRequest request, IWebBotRequestParameter requestParameter)
+        {
+            request.ExecRequest(_driver!, requestParameter);
         }
 
         private bool ExecuteExceptionFilter(Exception ex)
