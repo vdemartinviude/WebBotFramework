@@ -13,6 +13,5 @@ public interface IRequestParameter
 {
     public TimeSpan? DelayBefore { get; set; }
     public TimeSpan? DelayAfter { get; set; }
-    public CancellationToken? CancellationToken { get; set; }
     public ILogger<Robot>? Logger { get; set; }
 }
