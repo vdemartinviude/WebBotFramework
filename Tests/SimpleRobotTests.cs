@@ -1,4 +1,5 @@
 using RobotTests.Fixtures;
+using TheRobot.Requests;
 
 namespace RobotTests;
 
@@ -15,5 +16,11 @@ public class SimpleRobotTests : IClassFixture<RobotFixtures>
     public void Test1()
     {
         Assert.NotNull(robotFixtures);
+    }
+
+    [Fact]
+    public async Task EnsureRobotCanStartAsync()
+    {
+        await robotFixtures.Robot.Execute(new InitializeBrowserRequest());
     }
 }

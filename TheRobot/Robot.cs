@@ -14,7 +14,7 @@ namespace TheRobot
 {
     public class Robot : IRobot, IDisposable
     {
-        private IWebDriver _driver { get; set; }
+        private IWebDriver? _driver { get; set; }
         private IHttpClientFactory _httpClientFactory { get; set; }
         private readonly ILogger<Robot> _logger;
 
@@ -33,10 +33,7 @@ namespace TheRobot
 
         public async Task<RobotResponse> Execute(IRobotRequest request)
         {
-            if (_driver == null)
-            {
-                throw new Exception("Driver not loaded!");
-            }
+            request.logger = _logger;
 
             if (request.Timeout == null)
             {

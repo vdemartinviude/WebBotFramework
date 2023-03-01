@@ -35,7 +35,7 @@ public class InitializeBrowserRequest : IRobotRequest
         ChromeOptions options = new();
 
         options.AddUserProfilePreference("download.prompt_for_download", false);
-        options.AddUserProfilePreference("download.default_directory", DownloadFolder);
+        //options.AddUserProfilePreference("download.default_directory", DownloadFolder);
         options.AddArgument("--log-level=OFF");
         options.AddExcludedArgument("enable-logging");
 
