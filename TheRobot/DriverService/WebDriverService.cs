@@ -15,8 +15,11 @@ namespace TheRobot.DriverService;
 public class WebDriverService : IDisposable
 {
     private readonly ILogger<WebDriverService> _logger;
-    public IWebDriver WebDriver { get; private set; }
+    private readonly WebDriver WebDriver;
+
     public string DownloadFolder { get; private set; }
+
+    public WebDriver GetWebDriver() => WebDriver;
 
     public WebDriverService(ILogger<WebDriverService> logger)
     {

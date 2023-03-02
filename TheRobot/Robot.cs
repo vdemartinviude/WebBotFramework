@@ -28,71 +28,42 @@ namespace TheRobot
             _mediator = mediator;
         }
 
-        public async Task<RobotResponse> Execute(IRobotRequest request)
+        public async Task Exec3Async(IWebRobotRequest<RobotResponse> request, CancellationToken cancellationToken)
         {
-            //request.logger = _logger;
-
-            //if (request.Timeout == null)
-            //{
-            //    request.Timeout = TimeSpan.FromSeconds(5);
-            //}
-
-            //_logger.LogInformation("About to execute {@IRoboRequest}", request);
-            //RobotResponse response = new();
-
-            //try
-            //{
-            //    if (request.Timeout == null)
-            //    {
-            //        request.Timeout = TimeSpan.FromSeconds(5);
-            //    }
-
-            //    request.PreExecute?.Invoke(_driver);
-
-            //    if (request.DelayBefore.Ticks > 0)
-            //    {
-            //        await Task.Delay(request.DelayBefore);
-            //    }
-
-            //    response = request.Exec(_driver);
-
-            //    if (response.Status != RobotResponseStatus.ActionRealizedOk)
-            //    {
-            //        _logger.LogInformation("The request was not successfully");
-            //    }
-
-            //    if (request.DelayAfter.Ticks > 0)
-            //    {
-            //        await Task.Delay(request.DelayAfter);
-            //    }
-
-            //    request.PostExecute?.Invoke(_driver);
-            //}
-            //catch (Exception ex) when (ExecuteExceptionFilter(ex))
-            //{
-            //    _logger.LogInformation("An exception was thrown in the request execution.\nThe exception: {@Exception}", ex);
-            //    response.Status = RobotResponseStatus.ExceptionOccurred;
-            //    response.ErrorMessage = ex.Message;
-            //}
-            //catch (WebDriverException ex)
-            //{
-            //    _logger.LogError("An critical exception occurs at the robot driver.\nThe exception: {@Exception}", ex);
-            //    response.Status = RobotResponseStatus.ExceptionOccurred;
-            //    response.ErrorMessage = ex.Message;
-            //}
-
-            //_logger.LogInformation("{@IRoboRequest} Executed", request);
-            return new()
+            if (request.Parameters == null)
             {
-                Status = RobotResponseStatus.ActionRealizedOk
-            };
-        }
+                request.Parameters = new GenericRequestParameter
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
+            }
+            if (request.Parameters.Timeout == null)
+            {
+                request.Parameters.Timeout = TimeSpan.FromSeconds(10);
+            }
 
-        public async Task Exec3Async(IWebRobotRequest<RobotResponse> request)
-        {
-            //_logger.LogInformation(request.GeneralParameters!.DelayBefore.ToString());
+            if (request.Parameters.DelayBefore != null)
+            {
+                await Task.Delay(request.Parameters.DelayBefore.Value, cancellationToken);
+            }
 
-            await _mediator.Send(request);
+            try
+            {
+                await _mediator.Send(request, cancellationToken);
+            }
+            catch (Exception ex) when (ExecuteExceptionFilter(ex))
+            {
+                _logger.LogInformation("An exception was thrown in the request execution.\nThe exception: {@Exception}", ex);
+            }
+            catch (Exception _)
+            {
+                _logger.LogCritical("A critical exception was thrown in the request execution");
+            }
+
+            if (request.Parameters.DelayAfter != null)
+            {
+                await Task.Delay(request.Parameters.DelayAfter.Value, cancellationToken);
+            }
         }
 
         private bool ExecuteExceptionFilter(Exception ex)

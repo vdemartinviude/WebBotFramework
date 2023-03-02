@@ -21,7 +21,7 @@ public class HandleQuitDriver : IRequestHandler<MediatedQuitDriverRequest, Robot
 
     public async Task<RobotResponse> Handle(MediatedQuitDriverRequest request, CancellationToken cancellationToken)
     {
-        await Task.Run(() => _webDriverService.WebDriver.Quit(), cancellationToken);
+        await Task.Run(() => _webDriverService.GetWebDriver().Quit(), cancellationToken);
         return new()
         {
             Status = RobotResponseStatus.ActionRealizedOk
