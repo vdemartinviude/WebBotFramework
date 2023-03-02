@@ -12,9 +12,8 @@ namespace TheRobot.WebRequestsParameters;
 
 public class NavigateRequestParameters : IWebBotRequestParameter
 {
+    public string? Url { get; set; }
     public TimeSpan? Timeout { get; set; }
     public TimeSpan? DelayBefore { get; set; }
     public TimeSpan? DelayAfter { get; set; }
-    public ILogger<Robot>? Logger { get; set; }
-    public string? Url { get; set; }
 }

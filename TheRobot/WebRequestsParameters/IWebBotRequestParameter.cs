@@ -12,4 +12,6 @@ namespace TheRobot.WebRequestsParameters;
 public interface IWebBotRequestParameter : IRequestParameter
 {
     public TimeSpan? Timeout { get; set; }
+    public TimeSpan? DelayBefore { get; set; }
+    public TimeSpan? DelayAfter { get; set; }
 }
