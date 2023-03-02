@@ -14,6 +14,8 @@ using MediatR;
 using TheRobot.MediatedRequests;
 using TheRobot.RequestsInterface;
 using TheRobot.DriverService;
+using TheRobot.Responses;
+using OneOf;
 
 namespace TheRobot
 {
@@ -28,8 +30,10 @@ namespace TheRobot
             _mediator = mediator;
         }
 
-        public async Task Exec3Async(IWebRobotRequest<RobotResponse> request, CancellationToken cancellationToken)
+        public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Execute(IWebRobotRequest<OneOf<ErrorOnWebAction, SuccessOnWebAction>> request, CancellationToken cancellationToken)
         {
+            OneOf<ErrorOnWebAction, SuccessOnWebAction>? result = null;
+
             if (request.Parameters == null)
             {
                 request.Parameters = new GenericRequestParameter
@@ -46,24 +50,12 @@ namespace TheRobot
             {
                 await Task.Delay(request.Parameters.DelayBefore.Value, cancellationToken);
             }
-
-            try
-            {
-                await _mediator.Send(request, cancellationToken);
-            }
-            catch (Exception ex) when (ExecuteExceptionFilter(ex))
-            {
-                _logger.LogInformation("An exception was thrown in the request execution.\nThe exception: {@Exception}", ex);
-            }
-            catch (Exception _)
-            {
-                _logger.LogCritical("A critical exception was thrown in the request execution");
-            }
-
+            result = await _mediator.Send(request, cancellationToken);
             if (request.Parameters.DelayAfter != null)
             {
                 await Task.Delay(request.Parameters.DelayAfter.Value, cancellationToken);
             }
+            return result!.Value;
         }
 
         private bool ExecuteExceptionFilter(Exception ex)
@@ -71,7 +63,8 @@ namespace TheRobot
             return ex is NoSuchElementException ||
                    ex is WebDriverTimeoutException ||
                    ex is NoSuchFrameException ||
-                   ex is NoSuchWindowException;
+                   ex is NoSuchWindowException ||
+                   ex is WebDriverException;
         }
     }
 }

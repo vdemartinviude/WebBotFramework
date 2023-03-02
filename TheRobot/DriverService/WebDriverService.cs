@@ -24,10 +24,12 @@ public class WebDriverService : IDisposable
     public WebDriverService(ILogger<WebDriverService> logger)
     {
         new DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
+        DownloadFolder = Path.GetTempPath();
+
         ChromeOptions options = new();
 
         options.AddUserProfilePreference("download.prompt_for_download", false);
-        //options.AddUserProfilePreference("download.default_directory", DownloadFolder);
+        options.AddUserProfilePreference("download.default_directory", DownloadFolder);
         options.AddArgument("--log-level=OFF");
         options.AddExcludedArgument("enable-logging");
 

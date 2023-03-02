@@ -4,10 +4,15 @@ using TheRobot.Response;
 using TheRobot.DriverService;
 using TheRobot.WebRequestsParameters;
 using Microsoft.Extensions.Logging;
+using TheRobot.Responses;
+using System.Diagnostics;
+using OneOf;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace TheRobot.Handles;
 
-public class HandleNavigationRequest : IRequestHandler<MediatedNavigationRequest, RobotResponse>
+public class HandleNavigationRequest : IRequestHandler<MediatedNavigationRequest, OneOf<ErrorOnWebAction, SuccessOnWebAction>>
 {
     private readonly WebDriverService _webDriverService;
     private readonly ILogger<HandleNavigationRequest> _looger;
@@ -18,13 +23,17 @@ public class HandleNavigationRequest : IRequestHandler<MediatedNavigationRequest
         _looger = looger;
     }
 
-    public async Task<RobotResponse> Handle(MediatedNavigationRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedNavigationRequest request, CancellationToken cancellationToken)
     {
-        _looger.LogWarning("Teste do logger");
-        await Task.Run(() => _webDriverService.GetWebDriver().Navigate().GoToUrl(((NavigateRequestParameters)request!.Parameters).Url), cancellationToken);
-        return new RobotResponse()
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        if (request.Parameters is not NavigateRequestParameters navigateRequestParameters)
         {
-            Status = RobotResponseStatus.ActionRealizedOk
+            throw new ArgumentException("Invalid parameter type", nameof(request.Parameters));
+        }
+        await Task.Run(() => _webDriverService.GetWebDriver().Navigate().GoToUrl(navigateRequestParameters.Url), cancellationToken);
+        return new SuccessOnWebAction
+        {
+            ElapsedTime = stopwatch.Elapsed
         };
     }
 }

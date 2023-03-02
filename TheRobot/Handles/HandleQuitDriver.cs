@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using TheRobot.DriverService;
 using TheRobot.MediatedRequests;
 using TheRobot.Response;
+using OneOf;
+using TheRobot.Responses;
 
 namespace TheRobot.Handles;
 
-public class HandleQuitDriver : IRequestHandler<MediatedQuitDriverRequest, RobotResponse>
+public class HandleQuitDriver : IRequestHandler<MediatedQuitDriverRequest, OneOf<ErrorOnWebAction, SuccessOnWebAction>>
 {
     private readonly WebDriverService _webDriverService;
 
@@ -19,12 +21,12 @@ public class HandleQuitDriver : IRequestHandler<MediatedQuitDriverRequest, Robot
         _webDriverService = webDriverService;
     }
 
-    public async Task<RobotResponse> Handle(MediatedQuitDriverRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedQuitDriverRequest request, CancellationToken cancellationToken)
     {
         await Task.Run(() => _webDriverService.GetWebDriver().Quit(), cancellationToken);
-        return new()
+        return new SuccessOnWebAction()
         {
-            Status = RobotResponseStatus.ActionRealizedOk
+            ElapsedTime = TimeSpan.FromSeconds(0)
         };
     }
 }
