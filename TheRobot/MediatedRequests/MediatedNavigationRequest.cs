@@ -14,7 +14,7 @@ using TheRobot.WebRequestsParameters;
 
 namespace TheRobot.MediatedRequests;
 
-public class MediatedNavigationRequest : IWebRobotRequest<OneOf<ErrorOnWebAction, SuccessOnWebAction>>
+public class MediatedNavigationRequest : GenericMediatedRequest
 {
-    public IWebBotRequestParameter Parameters { get; set; }
+    public string Url { get; set; }
 }

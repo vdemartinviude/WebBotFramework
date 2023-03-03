@@ -8,10 +8,11 @@ using TheRobot.RequestsInterface;
 using TheRobot.Response;
 using TheRobot.Responses;
 using OneOf;
+using TheRobot.MediatedRequests;
 
 namespace TheRobot;
 
 public interface IRobot
 {
-    public abstract Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Execute(IWebRobotRequest<OneOf<ErrorOnWebAction, SuccessOnWebAction>> request, CancellationToken cancellationToken);
+    public abstract Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Execute(GenericMediatedRequest request, CancellationToken cancellationToken);
 }

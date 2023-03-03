@@ -11,7 +11,6 @@ using TheRobot.WebRequestsParameters;
 
 namespace TheRobot.MediatedRequests;
 
-public class MediatedQuitDriverRequest : IWebRobotRequest<OneOf<ErrorOnWebAction, SuccessOnWebAction>>
+public class MediatedQuitDriverRequest : GenericMediatedRequest
 {
-    public IWebBotRequestParameter Parameters { get; set; }
 }

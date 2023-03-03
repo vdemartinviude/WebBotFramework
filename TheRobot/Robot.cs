@@ -30,30 +30,30 @@ namespace TheRobot
             _mediator = mediator;
         }
 
-        public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Execute(IWebRobotRequest<OneOf<ErrorOnWebAction, SuccessOnWebAction>> request, CancellationToken cancellationToken)
+        public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Execute(GenericMediatedRequest request, CancellationToken cancellationToken)
         {
             OneOf<ErrorOnWebAction, SuccessOnWebAction>? result = null;
 
-            if (request.Parameters == null)
+            if (request.BaseParameters == null)
             {
-                request.Parameters = new GenericRequestParameter
+                request.BaseParameters = new GenericMediatedParameters
                 {
-                    Timeout = TimeSpan.FromSeconds(10)
+                    TimeOut = TimeSpan.FromSeconds(5)
                 };
             }
-            if (request.Parameters.Timeout == null)
+            if (request.BaseParameters.TimeOut == TimeSpan.Zero)
             {
-                request.Parameters.Timeout = TimeSpan.FromSeconds(10);
+                request.BaseParameters.TimeOut = TimeSpan.FromSeconds(5);
             }
 
-            if (request.Parameters.DelayBefore != null)
+            if (request.BaseParameters.DelayBefore != TimeSpan.Zero)
             {
-                await Task.Delay(request.Parameters.DelayBefore.Value, cancellationToken);
+                await Task.Delay(request.BaseParameters.DelayBefore, cancellationToken);
             }
             result = await _mediator.Send(request, cancellationToken);
-            if (request.Parameters.DelayAfter != null)
+            if (request.BaseParameters.DelayAfter != TimeSpan.Zero)
             {
-                await Task.Delay(request.Parameters.DelayAfter.Value, cancellationToken);
+                await Task.Delay(request.BaseParameters.DelayAfter, cancellationToken);
             }
             return result!.Value;
         }

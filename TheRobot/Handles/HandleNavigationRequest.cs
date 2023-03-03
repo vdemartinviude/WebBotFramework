@@ -26,11 +26,8 @@ public class HandleNavigationRequest : IRequestHandler<MediatedNavigationRequest
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedNavigationRequest request, CancellationToken cancellationToken)
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
-        if (request.Parameters is not NavigateRequestParameters navigateRequestParameters)
-        {
-            throw new ArgumentException("Invalid parameter type", nameof(request.Parameters));
-        }
-        await Task.Run(() => _webDriverService.GetWebDriver().Navigate().GoToUrl(navigateRequestParameters.Url), cancellationToken);
+
+        await Task.Run(() => _webDriverService.GetWebDriver().Navigate().GoToUrl(request.Url), cancellationToken);
         return new SuccessOnWebAction
         {
             ElapsedTime = stopwatch.Elapsed
