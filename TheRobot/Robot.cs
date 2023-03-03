@@ -1,41 +1,30 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Remote;
-using OpenQA.Selenium.Chromium;
-using System.Diagnostics;
-using TheRobot.Requests;
-using TheRobot.Response;
-using WebDriverManager;
-using WebDriverManager.DriverConfigs.Impl;
-using WebDriverManager.Helpers;
+﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using TheRobot.WebRequestsParameters;
-using MediatR;
-using TheRobot.MediatedRequests;
-using TheRobot.RequestsInterface;
-using TheRobot.DriverService;
-using TheRobot.Responses;
 using OneOf;
+using OpenQA.Selenium;
+using TheRobot.MediatedRequests;
+using TheRobot.Responses;
 
 namespace TheRobot
 {
     public class Robot : IRobot
     {
-        private readonly ILogger<Robot> _logger;
         private readonly IMediator _mediator;
+        private readonly IConfiguration _configuration;
 
-        public Robot(ILogger<Robot> logger, IMediator mediator)
+        public Robot(ILogger<Robot> logger, IMediator mediator, IConfiguration configuration)
         {
-            _logger = logger;
             _mediator = mediator;
+            _configuration = configuration;
         }
 
         public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Execute(GenericMediatedRequest request, CancellationToken cancellationToken)
         {
             OneOf<ErrorOnWebAction, SuccessOnWebAction>? result = null;
-
             if (request.BaseParameters == null)
             {
+                int defaultTime = _configuration.GetSection("RobotConfiguration").GetValue<int>("")
                 request.BaseParameters = new GenericMediatedParameters
                 {
                     TimeOut = TimeSpan.FromSeconds(5)
