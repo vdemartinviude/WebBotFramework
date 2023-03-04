@@ -1,22 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using TheRobot;
 using Serilog;
+using System.Reflection;
+using TheRobot;
+using TheRobot.DriverService;
+using TheRobot.PipelineExceptionHandler;
 
 namespace RobotTests.Fixtures;
 
 public class RobotFixtures : IDisposable
 {
     public readonly Robot Robot;
-    public readonly IHttpClientFactory HttpCientFactory;
     public readonly ILogger<Robot> Logger;
+    public readonly CancellationTokenSource TokenSource;
 
     public RobotFixtures()
     {
@@ -25,15 +24,21 @@ public class RobotFixtures : IDisposable
             .CreateLogger();
 
         IHost host = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration(x => x.AddJsonFile(@"Configuration\RobotConfiguration.json"))
             .ConfigureServices(services =>
             {
-                services.AddHttpClient();
+                services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Load("TheRobot")));
+                services.AddTransient(typeof(IPipelineBehavior<,>), typeof(MediatorPipelineBehavior<,>));
+                services.AddSingleton<WebDriverService>();
             })
             .UseSerilog()
             .Build();
-        HttpCientFactory = host.Services.GetRequiredService<IHttpClientFactory>();
-        Logger = host.Services.GetRequiredService<ILogger<Robot>>();
-        Robot = new Robot(HttpCientFactory, Logger);
+        var thelogger = host.Services.GetRequiredService<ILogger<Robot>>();
+        Robot = new Robot(
+            host.Services.GetRequiredService<IMediator>(),
+            host.Services.GetRequiredService<WebDriverService>(),
+            host.Services.GetRequiredService<IConfiguration>());
+        TokenSource = new();
     }
 
     public void Dispose()

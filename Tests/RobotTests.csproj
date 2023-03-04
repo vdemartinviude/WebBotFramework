@@ -28,4 +28,10 @@
     <ProjectReference Include="..\TheRobot\TheRobot.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Configuration\RobotConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

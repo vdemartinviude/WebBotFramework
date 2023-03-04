@@ -1,13 +1,13 @@
+using OpenQA.Selenium;
 using RobotTests.Fixtures;
-using TheRobot.Requests;
-using TheRobot.WebBotRequests;
-using TheRobot.WebRequestsParameters;
+using TheRobot;
+using TheRobot.MediatedRequests;
 
 namespace RobotTests;
 
 public class SimpleRobotTests : IClassFixture<RobotFixtures>
 {
-    private RobotFixtures robotFixtures;
+    private readonly RobotFixtures robotFixtures;
 
     public SimpleRobotTests(RobotFixtures robotFixtures)
     {
@@ -15,17 +15,41 @@ public class SimpleRobotTests : IClassFixture<RobotFixtures>
     }
 
     [Fact]
-    public void Test1()
+    public void AssureThatFixturesCanBeCreated()
     {
         Assert.NotNull(robotFixtures);
     }
 
     [Fact]
-    public void AssureRobotCanNavigate()
+    public async Task AssureThatRobotCanNavigateAsync()
     {
-        robotFixtures.Robot.Exec2(new WBR_NavigateRequest(), new NavigateRequestParameters
+        var token = robotFixtures.TokenSource.Token;
+        var result = await robotFixtures.Robot.Execute(new MediatedNavigationRequest
         {
             Url = "http://www.uol.com.br"
-        });
+        }, token);
+
+        Assert.Multiple(() => Assert.True(result.IsT1),
+                        () => Assert.Equal("https://www.uol.com.br/", result.AsT1.CurrentUrl),
+                        () => Assert.Equal("UOL - Seu universo online", result.AsT1.CurrentPageTitle));
+    }
+
+    [Fact]
+    public async Task AssureThatRobotCanClick()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = "https://www.rpachallenge.com/"
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedClickRequest
+        {
+            BaseParameters = new() { By = By.XPath("//input[@type='submit']") },
+            Kind = KindOfClik.ClickByDriver
+        }, token);
+
+        Assert.Multiple(() => Assert.True(result.IsT1),
+                        () => Assert.Equal("input", result.AsT1.WebElement.TagName));
     }
 }
