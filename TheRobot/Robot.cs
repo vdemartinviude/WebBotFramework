@@ -77,7 +77,7 @@ namespace TheRobot
                 }
             }
 
-            if (request.BaseParameters.DelayAfter != TimeSpan.Zero)
+            if (request.BaseParameters!.DelayAfter != TimeSpan.Zero)
             {
                 await Task.Delay(request.BaseParameters.DelayAfter, cancellationToken);
             }
