@@ -58,6 +58,11 @@ public class HandleMediatedClickRequest : IRequestHandler<MediatedClickRequest, 
                 case KindOfClik.ClickByDriver:
                     elementAlreadyFound.Click();
                     break;
+
+                case KindOfClik.ClickByJavaScriptWithFocus:
+                case KindOfClik.ClickByJavaScriptWithoutFocus:
+                    _webDriverService.GetWebDriver().ExecuteScript("arguments[0].click();", elementAlreadyFound);
+                    break;
             }
             return new SuccessOnWebAction
             {
