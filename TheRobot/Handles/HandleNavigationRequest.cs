@@ -11,7 +11,6 @@ namespace TheRobot.Handles;
 public class HandleNavigationRequest : IRequestHandler<MediatedNavigationRequest, OneOf<ErrorOnWebAction, SuccessOnWebAction>>
 {
     private readonly WebDriverService _webDriverService;
-    private readonly ILogger<HandleNavigationRequest> _looger;
 
     public HandleNavigationRequest(WebDriverService webDriverService)
     {

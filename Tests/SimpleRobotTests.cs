@@ -71,4 +71,28 @@ public class SimpleRobotTests : IClassFixture<RobotFixtures>
         Assert.Multiple(() => Assert.True(result.IsT1),
                         () => Assert.Equal("Google - Sobre", result!.AsT1!.CurrentPageTitle!));
     }
+
+    [Fact]
+    public async Task AssureThatRobotCanAccessAnIframe()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = "file://" + pageFilePath,
+        }, token);
+
+        await robotFixtures.Robot.Execute(new MediatedChangeFrameRequest()
+        {
+            BaseParameters = new() { By = By.Id("myiframe") }
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedClickRequest
+        {
+            BaseParameters = new() { By = By.Id("buttononiframe") },
+            Kind = KindOfClik.ClickByDriver
+        }, token);
+
+        Assert.True(result.IsT1);
+    }
 }
