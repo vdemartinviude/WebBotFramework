@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using JsonDocumentsManager;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +20,7 @@ public class RobotAndMachineFixtures : IDisposable
     public readonly ILogger<Robot> Logger;
     public readonly CancellationTokenSource TokenSource;
     public readonly TheMachine StateMachine;
+    public readonly InputJsonDocument InputJsonDocument;
 
     public RobotAndMachineFixtures()
     {
@@ -33,6 +35,7 @@ public class RobotAndMachineFixtures : IDisposable
                 services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Load("TheRobot")));
                 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(MediatorPipelineBehavior<,>));
                 services.AddSingleton<WebDriverService>();
+                services.AddSingleton(x => new InputJsonDocument("InputDataForTests\\InputJson.json"));
             })
             .UseSerilog()
             .Build();
@@ -42,9 +45,10 @@ public class RobotAndMachineFixtures : IDisposable
             host.Services.GetRequiredService<WebDriverService>(),
             host.Services.GetRequiredService<IConfiguration>());
 
-        StateMachine = new TheMachine(Robot, null, null, host.Services.GetRequiredService<IConfiguration>(), host.Services.GetRequiredService<ILogger<TheMachine>>(), 
+        StateMachine = new TheMachine(Robot, host.Services.GetRequiredService<InputJsonDocument>(), null, host.Services.GetRequiredService<IConfiguration>(), host.Services.GetRequiredService<ILogger<TheMachine>>(),
             TheStateMachineHelpers.GetMachineSpecification(Assembly.Load("StatesForTests")));
         TokenSource = new();
+        InputJsonDocument = host.Services.GetRequiredService<InputJsonDocument>();
     }
 
     public void Dispose()
