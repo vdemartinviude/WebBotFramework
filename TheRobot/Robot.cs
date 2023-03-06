@@ -48,31 +48,18 @@ namespace TheRobot
             }
             if (request.BaseParameters != null && request.BaseParameters.By != null)
             {
-                try
+                var elementScrolled = await _driverService.ScrollToElement(TimeSpan.FromMilliseconds(100), request.BaseParameters.By, cancellationToken);
+                if (elementScrolled.IsT1)
                 {
-                    var wait = new WebDriverWait(_driverService.GetWebDriver(), TimeSpan.FromMilliseconds(100));
-                    var element = wait.Until(d => d.FindElement(request.BaseParameters.By));
-                    new Actions(_driverService.GetWebDriver())
-                        .ScrollToElement(element)
-                        .Perform();
-                    request.BaseParameters.ElementAlreadyFound = element;
-                }
-                catch (Exception _)
-                {
+                    request.BaseParameters.ElementAlreadyFound = elementScrolled.AsT1.WebElement;
                 }
             }
 
             result = await _mediator.Send(request, cancellationToken);
 
-            if (request.BaseParameters != null && request.BaseParameters.By != null && result.Value.IsT1 && result.Value.AsT1.WebElement != null)
+            if (request.BaseParameters != null && request.BaseParameters.By != null && result.Value.IsT1)
             {
-                try
-                {
-                    _driverService.GetWebDriver().ExecuteScript("arguments[0].style.background='" + markdowncolor + "';", result.Value.AsT1.WebElement);
-                }
-                catch (Exception _)
-                {
-                }
+                await _driverService.MarkDownElement(TimeSpan.FromSeconds(1), request.BaseParameters.By, markdowncolor, cancellationToken);
             }
 
             if (request.BaseParameters!.DelayAfter != TimeSpan.Zero)
@@ -81,8 +68,8 @@ namespace TheRobot
             }
             if (result.Value.IsT1)
             {
-                result.Value.AsT1.CurrentUrl = _driverService.GetWebDriver().Url;
-                result.Value.AsT1.CurrentPageTitle = _driverService.GetWebDriver().Title;
+                result.Value.AsT1.CurrentUrl = _driverService.CurrentUrl;
+                result.Value.AsT1.CurrentPageTitle = _driverService.CurrentPageTitle;
             }
             return result!.Value;
         }

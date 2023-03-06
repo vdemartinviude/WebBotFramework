@@ -30,7 +30,7 @@ public class HandleMediatedClickRequest : IRequestHandler<MediatedClickRequest, 
         }
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        var actionresult = await Task.Run(() => _handleactions(request.BaseParameters.TimeOut, request.BaseParameters.By, request.Kind, cancellationToken, request.BaseParameters?.ElementAlreadyFound));
+        var actionresult = await Task.Run(() => _webDriverService.Click(request.BaseParameters.TimeOut, request.BaseParameters.By, request.Kind, cancellationToken));
         if (actionresult.IsT1)
         {
             stopwatch.Stop();
@@ -41,40 +41,5 @@ public class HandleMediatedClickRequest : IRequestHandler<MediatedClickRequest, 
             stopwatch.Stop();
         }
         return actionresult;
-    }
-
-    private OneOf<ErrorOnWebAction, SuccessOnWebAction> _handleactions(TimeSpan timeout, By by, KindOfClik kind, CancellationToken token, IWebElement? elementAlreadyFound)
-    {
-        try
-        {
-            if (elementAlreadyFound == null)
-            {
-                var wait = new WebDriverWait(_webDriverService.GetWebDriver(), timeout);
-                elementAlreadyFound = wait.Until(drv => drv.FindElement(by), token);
-            }
-
-            switch (kind)
-            {
-                case KindOfClik.ClickByDriver:
-                    elementAlreadyFound.Click();
-                    break;
-
-                case KindOfClik.ClickByJavaScriptWithFocus:
-                case KindOfClik.ClickByJavaScriptWithoutFocus:
-                    _webDriverService.GetWebDriver().ExecuteScript("arguments[0].click();", elementAlreadyFound);
-                    break;
-            }
-            return new SuccessOnWebAction
-            {
-                WebElement = elementAlreadyFound,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ErrorOnWebAction()
-            {
-                Error = ex.Message
-            };
-        }
     }
 }

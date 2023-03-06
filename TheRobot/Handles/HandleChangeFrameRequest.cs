@@ -35,7 +35,7 @@ public class HandleChangeFrameRequest : IRequestHandler<MediatedChangeFrameReque
         }
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        var actionresult = await Task.Run(() => _handleactions(request.BaseParameters.TimeOut, request.BaseParameters.By, cancellationToken, request.BaseParameters?.ElementAlreadyFound));
+        var actionresult = await Task.Run(() => _webDriverService.ChangeFrame(request.BaseParameters.TimeOut, request.BaseParameters.By, cancellationToken));
         if (actionresult.IsT1)
         {
             stopwatch.Stop();
@@ -46,29 +46,5 @@ public class HandleChangeFrameRequest : IRequestHandler<MediatedChangeFrameReque
             stopwatch.Stop();
         }
         return actionresult;
-    }
-
-    private OneOf<ErrorOnWebAction, SuccessOnWebAction> _handleactions(TimeSpan timeout, By by, CancellationToken token, IWebElement? elementAlreadyFound)
-    {
-        try
-        {
-            if (elementAlreadyFound == null)
-            {
-                var wait = new WebDriverWait(_webDriverService.GetWebDriver(), timeout);
-                elementAlreadyFound = wait.Until(drv => drv.FindElement(by), token);
-            }
-            _webDriverService.GetWebDriver().SwitchTo().Frame(elementAlreadyFound);
-            return new SuccessOnWebAction
-            {
-                WebElement = elementAlreadyFound,
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ErrorOnWebAction()
-            {
-                Error = ex.Message
-            };
-        }
     }
 }

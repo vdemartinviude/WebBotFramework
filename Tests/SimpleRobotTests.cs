@@ -95,4 +95,85 @@ public class SimpleRobotTests : IClassFixture<RobotFixtures>
 
         Assert.True(result.IsT1);
     }
+
+    [Fact]
+    public async Task AssureThatRobotCanSetTextByDriver()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = pageFilePath,
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
+        {
+            KindOfSetText = KindOfSetText.SetByWebDriver,
+            BaseParameters = new() { By = By.Id("textField"), TimeOut = TimeSpan.FromSeconds(5) },
+            TextToSet = "Vinicius"
+        }, token);
+
+        Assert.True(result.IsT1);
+    }
+
+    [Fact]
+    public async Task AssureRobotCanSetTextByKeyDown()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = pageFilePath,
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
+        {
+            KindOfSetText = KindOfSetText.SetWithKeyPress,
+            BaseParameters = new() { By = By.Id("textField"), TimeOut = TimeSpan.FromSeconds(5) },
+            TextToSet = "Vinicius"
+        }, token);
+
+        Assert.True(result.IsT1);
+    }
+
+    [Fact]
+    public async Task AssureRobotCanSetTextByKeyDownAnBackSpace()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = pageFilePath,
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
+        {
+            KindOfSetText = KindOfSetText.SetWithBackSpaceAndKeyPress,
+            BaseParameters = new() { By = By.Id("textFieldWithValue"), TimeOut = TimeSpan.FromSeconds(5) },
+            TextToSet = "Vinicius",
+            numberOfBackSpaces = 20
+        }, token);
+
+        Assert.True(result.IsT1);
+    }
+
+    [Fact]
+    public async Task AssureRobotCanSetTextByJs()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = pageFilePath,
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
+        {
+            KindOfSetText = KindOfSetText.SetWithJs,
+            BaseParameters = new() { By = By.Id("textFieldWithValue"), TimeOut = TimeSpan.FromSeconds(5) },
+            TextToSet = "Vinicius",
+        }, token);
+
+        Assert.True(result.IsT1);
+    }
 }

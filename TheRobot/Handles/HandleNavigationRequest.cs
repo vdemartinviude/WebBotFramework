@@ -19,12 +19,6 @@ public class HandleNavigationRequest : IRequestHandler<MediatedNavigationRequest
 
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedNavigationRequest request, CancellationToken cancellationToken)
     {
-        Stopwatch stopwatch = Stopwatch.StartNew();
-
-        await Task.Run(() => _webDriverService.GetWebDriver().Navigate().GoToUrl(request.Url), cancellationToken);
-        return new SuccessOnWebAction
-        {
-            ElapsedTime = stopwatch.Elapsed
-        };
+        return await Task.Run(() => _webDriverService.NavigateTo(request.Url), cancellationToken);
     }
 }

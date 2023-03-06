@@ -23,10 +23,6 @@ public class HandleQuitDriver : IRequestHandler<MediatedQuitDriverRequest, OneOf
 
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedQuitDriverRequest request, CancellationToken cancellationToken)
     {
-        await Task.Run(() => _webDriverService.GetWebDriver().Quit(), cancellationToken);
-        return new SuccessOnWebAction()
-        {
-            ElapsedTime = TimeSpan.FromSeconds(0)
-        };
+        return await Task.Run(() => _webDriverService.QuitDriver(), cancellationToken);
     }
 }
