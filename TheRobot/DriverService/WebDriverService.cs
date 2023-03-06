@@ -217,6 +217,25 @@ public class WebDriverService : IDisposable
         await Task.Run(() => actions.Perform(), token);
     }
 
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> ElementExists(TimeSpan timeOut, By by, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var element = await GetWebElement(timeOut, by, cancellationToken);
+            return new SuccessOnWebAction
+            {
+                WebElement = element
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ErrorOnWebAction
+            {
+                Error = ex.Message
+            };
+        }
+    }
+
     private async Task<IWebElement> GetWebElement(TimeSpan timeout, By by, CancellationToken token)
     {
         var wait = new WebDriverWait(_webDriver, timeout);

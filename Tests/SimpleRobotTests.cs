@@ -6,11 +6,11 @@ using TheRobot.MediatedRequests;
 
 namespace RobotTests;
 
-public class SimpleRobotTests : IClassFixture<RobotFixtures>
+public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
 {
-    private readonly RobotFixtures robotFixtures;
+    private readonly RobotAndMachineFixtures robotFixtures;
 
-    public SimpleRobotTests(RobotFixtures robotFixtures)
+    public SimpleRobotTests(RobotAndMachineFixtures robotFixtures)
     {
         this.robotFixtures = robotFixtures;
     }

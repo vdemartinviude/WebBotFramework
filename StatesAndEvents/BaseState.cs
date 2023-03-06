@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using TheRobot;
 using Serilog;
 using TheRobot.Requests;
+using TheRobot.MediatedRequests;
 
 namespace StatesAndEvents;
 
@@ -82,11 +83,18 @@ public class BaseState : IState
             await Execute(token);
             token.ThrowIfCancellationRequested();
             Thread.Sleep(100);
-            await _robot.Execute(new ElementExistRequest
+            var res = await _robot.Execute(new MediatedElementExistsRequest
             {
-                By = By.XPath("//body"),
-                Timeout = TimeSpan.FromSeconds(10)
-            });
+                BaseParameters = new GenericMediatedParameters
+                {
+                    By = By.XPath("//body"),
+                    TimeOut = TimeSpan.FromSeconds(10)
+                }
+            }, token);
+            if (res.IsT0)
+            {
+                throw new Exception("Robot Error - No page body found!");
+            }
 
             await activeStateMachine.Fire(MachineEvents.NormalTransition);
             autoEvent.Set();

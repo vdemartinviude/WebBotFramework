@@ -25,7 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\StatesForTests\StatesForTests.csproj" />
     <ProjectReference Include="..\TheRobot\TheRobot.csproj" />
+    <ProjectReference Include="..\TheStateMachine\TheStateMachine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

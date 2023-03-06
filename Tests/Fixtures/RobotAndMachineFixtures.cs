@@ -8,16 +8,19 @@ using System.Reflection;
 using TheRobot;
 using TheRobot.DriverService;
 using TheRobot.PipelineExceptionHandler;
+using TheStateMachine;
+using TheStateMachine.Helpers;
 
 namespace RobotTests.Fixtures;
 
-public class RobotFixtures : IDisposable
+public class RobotAndMachineFixtures : IDisposable
 {
     public readonly Robot Robot;
     public readonly ILogger<Robot> Logger;
     public readonly CancellationTokenSource TokenSource;
+    public readonly TheMachine StateMachine;
 
-    public RobotFixtures()
+    public RobotAndMachineFixtures()
     {
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File("logs/robtotest.log")
@@ -38,6 +41,9 @@ public class RobotFixtures : IDisposable
             host.Services.GetRequiredService<IMediator>(),
             host.Services.GetRequiredService<WebDriverService>(),
             host.Services.GetRequiredService<IConfiguration>());
+
+        StateMachine = new TheMachine(Robot, null, null, host.Services.GetRequiredService<IConfiguration>(), host.Services.GetRequiredService<ILogger<TheMachine>>(), 
+            TheStateMachineHelpers.GetMachineSpecification(Assembly.Load("StatesForTests")));
         TokenSource = new();
     }
 
