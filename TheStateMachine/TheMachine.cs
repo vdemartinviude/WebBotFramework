@@ -17,12 +17,13 @@ namespace TheStateMachine
 
         private readonly MachineSpecification _machineSpecification;
         private readonly ResultJsonDocument _resultDocument;
+        private readonly ILoggerFactory _loggerFactory;
 
         private readonly Robot _robot;
         private readonly CancellationTokenSource cts;
         private readonly CancellationToken token;
 
-        public TheMachine(Robot robot, InputJsonDocument inputJsonDocument, ResultJsonDocument resultJsonDocument, IConfiguration configuration, ILogger<TheMachine> logger, MachineSpecification machineSpecification)
+        public TheMachine(Robot robot, InputJsonDocument inputJsonDocument, ResultJsonDocument resultJsonDocument, IConfiguration configuration, ILogger<TheMachine> logger, MachineSpecification machineSpecification, ILoggerFactory loggerFactory)
         {
             _robot = robot;
             _inputDocument = inputJsonDocument;
@@ -33,6 +34,7 @@ namespace TheStateMachine
             cts = new();
             token = cts.Token;
             _machineSpecification = machineSpecification;
+            _loggerFactory = loggerFactory;
         }
 
         public AsyncActiveStateMachine<BaseState, MachineEvents>? Machine { get; private set; }
@@ -44,7 +46,12 @@ namespace TheStateMachine
             BaseState? theFirstState = null;
 
             var states = _machineSpecification.States!
-                .Select(st => (BaseState)Activator.CreateInstance(st, new object[] { _robot, _inputDocument, _resultDocument })!).ToList();
+                .Select(st => (BaseState)Activator.CreateInstance(st, new object[] {
+                new StateInfrastructure {
+                    LoggerFactory = _loggerFactory,
+                    Robot = _robot,
+                    InputJsonDocument = _inputDocument,
+                    ResultJsonDocument = _resultDocument}})!).ToList();
             foreach (var state in states)
             {
                 builder.In(state).ExecuteOnEntry(() => MachineExecuteState(state));

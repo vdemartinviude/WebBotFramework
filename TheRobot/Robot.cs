@@ -55,9 +55,9 @@ namespace TheRobot
 
             result = await _mediator.Send(request, cancellationToken);
 
-            if (request.BaseParameters != null && request.BaseParameters.By != null && result.Value.IsT1)
+            if (request.BaseParameters != null && result.Value.IsT1 && result.Value.AsT1.WebElement != null)
             {
-                await _driverService.MarkDownElement(TimeSpan.FromSeconds(1), request.BaseParameters.By, markdowncolor, cancellationToken);
+                await _driverService.MarkDownElement(result.Value.AsT1.WebElement, markdowncolor, cancellationToken);
             }
 
             if (request.BaseParameters!.DelayAfter != TimeSpan.Zero)

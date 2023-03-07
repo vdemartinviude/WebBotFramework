@@ -148,15 +148,21 @@ public class WebDriverService : IDisposable
         }
     }
 
-    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> MarkDownElement(TimeSpan timeout, By by, string markDownColor, CancellationToken token)
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> MarkDownElement(IWebElement element, string markDownColor, CancellationToken token)
     {
         try
         {
-            IWebElement element = await GetWebElement(timeout, by, token);
-            _webDriver.ExecuteScript($"arguments[0].style.background='{markDownColor}';", element);
+            await Task.Run(() => _webDriver.ExecuteScript($"arguments[0].style.background='{markDownColor}';", element), token);
             return new SuccessOnWebAction
             {
                 WebElement = element
+            };
+        }
+        catch (StaleElementReferenceException ex)
+        {
+            return new ErrorOnWebAction
+            {
+                Error = ex.Message
             };
         }
         catch (Exception ex)

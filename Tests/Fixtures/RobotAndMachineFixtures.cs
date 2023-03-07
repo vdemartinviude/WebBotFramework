@@ -46,7 +46,8 @@ public class RobotAndMachineFixtures : IDisposable
             host.Services.GetRequiredService<IConfiguration>());
 
         StateMachine = new TheMachine(Robot, host.Services.GetRequiredService<InputJsonDocument>(), null, host.Services.GetRequiredService<IConfiguration>(), host.Services.GetRequiredService<ILogger<TheMachine>>(),
-            TheStateMachineHelpers.GetMachineSpecification(Assembly.Load("StatesForTests")));
+            TheStateMachineHelpers.GetMachineSpecification(Assembly.Load("StatesForTests")),
+            host.Services.GetRequiredService<ILoggerFactory>());
         TokenSource = new();
         InputJsonDocument = host.Services.GetRequiredService<InputJsonDocument>();
     }

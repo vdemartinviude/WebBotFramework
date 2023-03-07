@@ -28,16 +28,12 @@ public class BaseState : IState
 
     public virtual TimeSpan StateTimeout => TimeSpan.FromSeconds(5);
 
-    protected readonly Robot _robot;
-    protected readonly InputJsonDocument _inputData;
-    protected readonly ResultJsonDocument _results;
+    protected readonly StateInfrastructure _stateInfra;
 
-    public BaseState(string name, Robot robot, InputJsonDocument inputdata, ResultJsonDocument resultJson)
+    public BaseState(string name, StateInfrastructure stateInfrastructure)
     {
         Name = name;
-        _robot = robot;
-        _inputData = inputdata;
-        _results = resultJson;
+        _stateInfra = stateInfrastructure;
     }
 
     public override bool Equals(object? obj)
