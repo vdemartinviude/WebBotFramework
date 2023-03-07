@@ -20,9 +20,11 @@ public class StateMachineTests : IClassFixture<RobotAndMachineFixtures>
     }
 
     [Fact]
-    public void AssureMachineCanBuild()
+    public void AssureMachineCanBuildAndRun()
     {
         _Robotfixture.StateMachine.Build();
+        _Robotfixture.StateMachine.ExecuteMachine();
+        while (_Robotfixture.StateMachine.RobotWorking) ;
     }
 
     [Fact]

@@ -75,36 +75,6 @@ public class BaseState : IState
         return string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase);
     }
 
-    public async Task MainExecute(AsyncActiveStateMachine<BaseState, MachineEvents> activeStateMachine, CancellationToken token, AutoResetEvent autoEvent)
-    {
-        Log.Information("Executing state {@state}", this);
-        try
-        {
-            await Execute(token);
-            token.ThrowIfCancellationRequested();
-            Thread.Sleep(100);
-            var res = await _robot.Execute(new MediatedElementExistsRequest
-            {
-                BaseParameters = new GenericMediatedParameters
-                {
-                    By = By.XPath("//body"),
-                    TimeOut = TimeSpan.FromSeconds(10)
-                }
-            }, token);
-            if (res.IsT0)
-            {
-                throw new Exception("Robot Error - No page body found!");
-            }
-
-            await activeStateMachine.Fire(MachineEvents.NormalTransition);
-            autoEvent.Set();
-        }
-        catch (Exception)
-        {
-            await activeStateMachine.FirePriority(MachineEvents.FinalizeMachine);
-        }
-    }
-
     public virtual Task Execute(CancellationToken token)
     {
         return Task.CompletedTask;

@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using OneOf;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Support.UI;
 using TheRobot.DriverService;
 using TheRobot.MediatedRequests;
 using TheRobot.Responses;

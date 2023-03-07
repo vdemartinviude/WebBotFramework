@@ -126,7 +126,7 @@ namespace TheStateMachine
             }
         }
 
-        private void MachineExecuteState(BaseState state)
+        private async Task MachineExecuteState(BaseState state)
         {
             AutoResetEvent autoResetEvent = new(false);
 
@@ -136,15 +136,19 @@ namespace TheStateMachine
 
             _logger.LogWarning($"Executing the state: {state.Name}");
 
-            var task = factory.StartNew(async () => await state.MainExecute(Machine!, token, autoResetEvent));
+            //var task = factory.StartNew(async () => await state.Execute(token));
+            await state.Execute(token);
+            await Machine!.Fire(MachineEvents.NormalTransition);
+            autoResetEvent.Set();
         }
 
-        private void watchdogEventSignled(object? state, bool timedOut)
+        private async void watchdogEventSignled(object? state, bool timedOut)
         {
             if (timedOut)
             {
                 _logger.LogCritical("State {name} timeout", state!.GetType().Name);
                 cts.Cancel();
+                await Machine!.FirePriority(MachineEvents.FinalizeMachine);
             }
         }
     }
