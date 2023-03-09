@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using OneOf;
+using OpenQA.Selenium;
 using TheRobot.DriverService;
 using TheRobot.MediatedRequests;
 using TheRobot.Responses;
@@ -29,6 +30,7 @@ namespace TheRobot
         {
             int defaultTimeout = _configuration.GetRequiredSection("RobotConfiguration").GetValue<int>("DefaultTimeout");
             string markdowncolor = _configuration.GetRequiredSection("RobotConfiguration").GetValue<string>("MarkdownColor")!;
+            bool markdownenabled = _configuration.GetRequiredSection("RobotConfiguration").GetValue<bool>("MarkDownEnabled")!;
 
             OneOf<ErrorOnWebAction, SuccessOnWebAction>? result;
             request.BaseParameters ??= new GenericMediatedParameters
@@ -44,20 +46,16 @@ namespace TheRobot
             {
                 await Task.Delay(request.BaseParameters.DelayBefore, cancellationToken);
             }
-            if (request.BaseParameters != null && request.BaseParameters.By != null)
+            if (request.BaseParameters != null && request.BaseParameters != null && request.BaseParameters.ByOrElement != null && request.BaseParameters.ByOrElement.IsT0)
             {
-                var elementScrolled = await _driverService.ScrollToElement(TimeSpan.FromMilliseconds(100), request.BaseParameters.By, cancellationToken);
-                if (elementScrolled.IsT1)
-                {
-                    request.BaseParameters.ElementAlreadyFound = elementScrolled.AsT1.WebElement;
-                }
+                var elementScrolled = await _driverService.ScrollToElement(TimeSpan.FromMilliseconds(100), request.BaseParameters.ByOrElement, cancellationToken);
             }
 
             result = await _mediator.Send(request, cancellationToken);
 
-            if (request.BaseParameters != null && result.Value.IsT1 && result.Value.AsT1.WebElement != null)
+            if (request.BaseParameters != null && result.Value.IsT1 && result.Value.AsT1.WebElement != null && markdownenabled)
             {
-                await _driverService.MarkDownElement(result.Value.AsT1.WebElement, markdowncolor, cancellationToken);
+                await _driverService.MarkDownElement(TimeSpan.FromMilliseconds(100), new GenericWebElement((WebElement)result.Value.AsT1.WebElement), markdowncolor, cancellationToken);
             }
 
             if (request.BaseParameters!.DelayAfter != TimeSpan.Zero)

@@ -25,17 +25,9 @@ public class HandleChangeFrameRequest : IRequestHandler<MediatedChangeFrameReque
 
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedChangeFrameRequest request, CancellationToken cancellationToken)
     {
-        if (request.BaseParameters == null)
-        {
-            throw new ArgumentNullException("BaseParameters");
-        }
-        if (request.BaseParameters.By == null)
-        {
-            throw new ArgumentNullException("By");
-        }
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        var actionresult = await Task.Run(() => _webDriverService.ChangeFrame(request.BaseParameters.TimeOut, request.BaseParameters.By, cancellationToken));
+        var actionresult = await Task.Run(() => _webDriverService.ChangeFrame(request.BaseParameters.TimeOut, request.BaseParameters.ByOrElement, cancellationToken));
         if (actionresult.IsT1)
         {
             stopwatch.Stop();

@@ -22,6 +22,6 @@ public class HandleSetTextRequest : IRequestHandler<MediatedSetTextRequest, OneO
 
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedSetTextRequest request, CancellationToken cancellationToken)
     {
-        return await _driverService.SetText(request.KindOfSetText, request.TextToSet, request.BaseParameters.TimeOut, request.BaseParameters.By, request.numberOfBackSpaces, cancellationToken);
+        return await _driverService.SetText(request.KindOfSetText, request.TextToSet, request.BaseParameters.TimeOut, request.BaseParameters.ByOrElement, request.numberOfBackSpaces, cancellationToken);
     }
 }

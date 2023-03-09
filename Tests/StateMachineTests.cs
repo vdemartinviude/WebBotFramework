@@ -43,7 +43,10 @@ public class StateMachineTests : IClassFixture<RobotAndMachineFixtures>
         var machinespec = TheStateMachineHelpers.GetMachineSpecification(Assembly.LoadFrom("StatesForTests"));
         var states = machinespec.States!.OrderBy(x => x.Name).ToList();
 
-        await ((BaseState)Activator.CreateInstance(states.Single(x => x.Name == "FirstTestState"), new object[] { _Robotfixture.Robot, null, null })!).Execute(_Robotfixture.TokenSource.Token);
+        await ((BaseState)Activator.CreateInstance(states.Single(x => x.Name == "FirstTestState"), new object[] { new StateInfrastructure {
+                            LoggerFactory = _Robotfixture.LoggerFactory,
+                            InputJsonDocument = _Robotfixture.InputJsonDocument,
+                            Robot = _Robotfixture.Robot } })!).Execute(_Robotfixture.TokenSource.Token);
         Assert.True(true);
     }
 
@@ -53,7 +56,13 @@ public class StateMachineTests : IClassFixture<RobotAndMachineFixtures>
         var machinespec = TheStateMachineHelpers.GetMachineSpecification(Assembly.LoadFrom("StatesForTests"));
         var states = machinespec.States!.OrderBy(x => x.Name).ToList();
 
-        await ((BaseState)Activator.CreateInstance(states.Single(x => x.Name == "FirstTestState"), new object[] { _Robotfixture.Robot, null, null })!).Execute(_Robotfixture.TokenSource.Token);
-        await ((BaseState)Activator.CreateInstance(states.Single(x => x.Name == "SecondTestState"), new object[] { _Robotfixture.Robot, _Robotfixture.InputJsonDocument, null })!).Execute(_Robotfixture.TokenSource.Token);
+        await ((BaseState)Activator.CreateInstance(states.Single(x => x.Name == "FirstTestState"), new object[] { new StateInfrastructure {
+                            LoggerFactory = _Robotfixture.LoggerFactory,
+                            InputJsonDocument = _Robotfixture.InputJsonDocument,
+                            Robot = _Robotfixture.Robot} })!).Execute(_Robotfixture.TokenSource.Token);
+        await ((BaseState)Activator.CreateInstance(states.Single(x => x.Name == "SecondTestState"), new object[] { new StateInfrastructure {
+                            LoggerFactory = _Robotfixture.LoggerFactory,
+                            InputJsonDocument = _Robotfixture.InputJsonDocument,
+                            Robot = _Robotfixture.Robot } })!).Execute(_Robotfixture.TokenSource.Token);
     }
 }

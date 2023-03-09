@@ -72,6 +72,17 @@ namespace TheStateMachine
             Machine!.Start();
         }
 
+        public async Task ExecuteSingleState(string stateName)
+        {
+            var state = (BaseState)Activator.CreateInstance(_machineSpecification.States.Single(s => s.Name == stateName), new object[] {
+                new StateInfrastructure {
+                    LoggerFactory = _loggerFactory,
+                    Robot = _robot,
+                    InputJsonDocument = _inputDocument,
+                    ResultJsonDocument = _resultDocument}})!;
+            await state.Execute(token);
+        }
+
         private void _endMachineByNoGuardActivate()
         {
             _logger.LogCritical("No guard was fired for the current state!");

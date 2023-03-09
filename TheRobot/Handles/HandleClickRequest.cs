@@ -20,17 +20,9 @@ public class HandleMediatedClickRequest : IRequestHandler<MediatedClickRequest, 
 
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedClickRequest request, CancellationToken cancellationToken)
     {
-        if (request.BaseParameters == null)
-        {
-            throw new ArgumentNullException("BaseParameters");
-        }
-        if (request.BaseParameters.By == null)
-        {
-            throw new ArgumentNullException("By");
-        }
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        var actionresult = await Task.Run(() => _webDriverService.Click(request.BaseParameters.TimeOut, request.BaseParameters.By, request.Kind, cancellationToken));
+        var actionresult = await Task.Run(() => _webDriverService.Click(request.BaseParameters.TimeOut, request.BaseParameters.ByOrElement, request.Kind, cancellationToken));
         if (actionresult.IsT1)
         {
             stopwatch.Stop();

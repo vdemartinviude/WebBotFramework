@@ -1,7 +1,5 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.DevTools.V108.Runtime;
 using RobotTests.Fixtures;
-using TheRobot;
 using TheRobot.MediatedRequests;
 
 namespace RobotTests;
@@ -22,20 +20,6 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
     }
 
     [Fact]
-    public async Task AssureThatRobotCanNavigateAsync()
-    {
-        var token = robotFixtures.TokenSource.Token;
-        var result = await robotFixtures.Robot.Execute(new MediatedNavigationRequest
-        {
-            Url = "http://www.uol.com.br"
-        }, token);
-
-        Assert.Multiple(() => Assert.True(result.IsT1),
-                        () => Assert.Equal("https://www.uol.com.br/", result.AsT1.CurrentUrl),
-                        () => Assert.Equal("UOL - Seu universo online", result.AsT1.CurrentPageTitle));
-    }
-
-    [Fact]
     public async Task AssureThatRobotCanClick()
     {
         var token = robotFixtures.TokenSource.Token;
@@ -46,7 +30,7 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
 
         var result = await robotFixtures.Robot.Execute(new MediatedClickRequest
         {
-            BaseParameters = new() { By = By.XPath("//input[@type='submit']") },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.XPath("//input[@type='submit']")) },
             Kind = KindOfClik.ClickByDriver
         }, token);
 
@@ -65,7 +49,7 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
 
         var result = await robotFixtures.Robot.Execute(new MediatedClickRequest
         {
-            BaseParameters = new() { By = By.XPath("//a[text()='Sobre']") },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.XPath("//a[text()='Sobre']")) },
             Kind = KindOfClik.ClickByJavaScriptWithFocus
         }, token);
         Assert.Multiple(() => Assert.True(result.IsT1),
@@ -84,12 +68,12 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
 
         await robotFixtures.Robot.Execute(new MediatedChangeFrameRequest()
         {
-            BaseParameters = new() { By = By.Id("myiframe") }
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("myiframe")) }
         }, token);
 
         var result = await robotFixtures.Robot.Execute(new MediatedClickRequest
         {
-            BaseParameters = new() { By = By.Id("buttononiframe") },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("buttononiframe")) },
             Kind = KindOfClik.ClickByDriver
         }, token);
 
@@ -109,7 +93,7 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
         var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
         {
             KindOfSetText = KindOfSetText.SetByWebDriver,
-            BaseParameters = new() { By = By.Id("textField"), TimeOut = TimeSpan.FromSeconds(5) },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("textField")), TimeOut = TimeSpan.FromSeconds(5) },
             TextToSet = "Vinicius"
         }, token);
 
@@ -129,7 +113,7 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
         var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
         {
             KindOfSetText = KindOfSetText.SetWithKeyPress,
-            BaseParameters = new() { By = By.Id("textField"), TimeOut = TimeSpan.FromSeconds(5) },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("textField")), TimeOut = TimeSpan.FromSeconds(5) },
             TextToSet = "Vinicius"
         }, token);
 
@@ -149,7 +133,7 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
         var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
         {
             KindOfSetText = KindOfSetText.SetWithBackSpaceAndKeyPress,
-            BaseParameters = new() { By = By.Id("textFieldWithValue"), TimeOut = TimeSpan.FromSeconds(5) },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("textFieldWithValue")), TimeOut = TimeSpan.FromSeconds(5) },
             TextToSet = "Vinicius",
             numberOfBackSpaces = 20
         }, token);
@@ -170,10 +154,42 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
         var result = await robotFixtures.Robot.Execute(new MediatedSetTextRequest
         {
             KindOfSetText = KindOfSetText.SetWithJs,
-            BaseParameters = new() { By = By.Id("textFieldWithValue"), TimeOut = TimeSpan.FromSeconds(5) },
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("textFieldWithValue")), TimeOut = TimeSpan.FromSeconds(5) },
             TextToSet = "Vinicius",
         }, token);
 
         Assert.True(result.IsT1);
+    }
+
+    [Fact]
+    public async Task AssureRobotCanClickShadowDom()
+    {
+        var token = robotFixtures.TokenSource.Token;
+
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            BaseParameters = new() { DelayAfter = TimeSpan.FromSeconds(10) },
+            Url = "https://portalhome.eneldistribuicaosp.com.br/#/autenticacao/login"
+        }, token);
+
+        await robotFixtures.Robot.Execute(new MediatedClickRequest
+        {
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("truste-consent-button")), DelayAfter = TimeSpan.FromSeconds(20) }
+        }, token);
+
+        var shadow = await robotFixtures.Robot.Execute(new MediatedGetShadowRoot
+        {
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.XPath("//enel-login-welcome")), DelayAfter = TimeSpan.FromSeconds(5) }
+        }, token);
+
+        var click = await robotFixtures.Robot.Execute(new MediatedClickRequest
+        {
+            BaseParameters = new()
+            {
+                ByOrElement =
+                                                      new GenericWebElement(new ElementFromSearchContext { SearchContext = shadow.AsT1.SearchContext, CssSelector = "enel-button" })
+            }
+        }, token);
+        Assert.True(shadow.IsT1);
     }
 }

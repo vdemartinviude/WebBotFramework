@@ -23,17 +23,9 @@ public class HandleElementExistsRequest : IRequestHandler<MediatedElementExistsR
 
     public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> Handle(MediatedElementExistsRequest request, CancellationToken cancellationToken)
     {
-        if (request.BaseParameters == null)
-        {
-            throw new ArgumentNullException("BaseParameters");
-        }
-        if (request.BaseParameters.By == null)
-        {
-            throw new ArgumentNullException("By");
-        }
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        OneOf<ErrorOnWebAction, SuccessOnWebAction> result = await _driverService.ElementExists(request.BaseParameters.TimeOut, request.BaseParameters.By, cancellationToken);
+        OneOf<ErrorOnWebAction, SuccessOnWebAction> result = await _driverService.ElementExists(request.BaseParameters.TimeOut, request.BaseParameters.ByOrElement, cancellationToken);
         stopwatch.Stop();
         if (result.IsT1) { result.AsT1.ElapsedTime = stopwatch.Elapsed; }
         return result;

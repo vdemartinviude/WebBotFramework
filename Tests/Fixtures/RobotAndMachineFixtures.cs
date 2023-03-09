@@ -21,6 +21,7 @@ public class RobotAndMachineFixtures : IDisposable
     public readonly CancellationTokenSource TokenSource;
     public readonly TheMachine StateMachine;
     public readonly InputJsonDocument InputJsonDocument;
+    public readonly ILoggerFactory LoggerFactory;
 
     public RobotAndMachineFixtures()
     {
@@ -40,6 +41,7 @@ public class RobotAndMachineFixtures : IDisposable
             .UseSerilog()
             .Build();
         var thelogger = host.Services.GetRequiredService<ILogger<Robot>>();
+        LoggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
         Robot = new Robot(
             host.Services.GetRequiredService<IMediator>(),
             host.Services.GetRequiredService<WebDriverService>(),

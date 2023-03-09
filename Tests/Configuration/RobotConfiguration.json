@@ -1,6 +1,7 @@
 {
   "RobotConfiguration": {
     "DefaultTimeout": 5,
-    "MarkdownColor": "lightgreen"
+    "MarkdownColor": "lightgreen",
+    "MarkdownEnabled": true
   }
 }

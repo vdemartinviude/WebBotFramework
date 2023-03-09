@@ -9,4 +9,5 @@ public class SuccessOnWebAction
     public string CurrentPageTitle { get; set; }
     public IEnumerable<IWebElement> WebElements { get; set; }
     public IWebElement WebElement { get; set; }
+    public ISearchContext SearchContext { get; set; }
 }
