@@ -161,15 +161,27 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
         Assert.True(result.IsT1);
     }
 
-    [Fact]
-    public async Task AssureRobotCanSelect()
+    [Theory]
+    [InlineData(KindOfSelect.SelectByDriveByText, "Zezinho", "")]
+    [InlineData(KindOfSelect.SelectByDriveByValue, "", "1")]
+    public async Task AssureRobotCanSelect(KindOfSelect kindOfSelect, string text, string value)
     {
         var token = robotFixtures.TokenSource.Token;
-        await robotFixtures.Robot.Execute(new MediatedSelectRequest
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
         {
-            BaseParameters = new() { ByOrElement = new GenericWebElement(By.XPath("")) },
-            KindOfSelect = KindOfSelect.SelectByDrive
+            Url = pageFilePath,
         }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedSelectRequest
+        {
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.Id("selecttest")) },
+            KindOfSelect = kindOfSelect,
+            Text = text,
+            Value = value
+        }, token);
+
+        Assert.True(result.IsT1);
     }
 
     [Fact]

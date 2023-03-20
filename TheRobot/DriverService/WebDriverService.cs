@@ -263,6 +263,48 @@ public class WebDriverService : IDisposable
         }
     }
 
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> SelectByDriveByValue(TimeSpan timeOut, GenericWebElement byOrElement, string value, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var element = await GetWebElement(timeOut, byOrElement, cancellationToken);
+            var select = new SelectElement(element);
+            select.SelectByValue(value);
+            return new SuccessOnWebAction
+            {
+                WebElement = element
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ErrorOnWebAction
+            {
+                Error = ex.Message
+            };
+        }
+    }
+
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> SelectByDriveByText(TimeSpan timeOut, GenericWebElement byOrElement, string text, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var element = await GetWebElement(timeOut, byOrElement, cancellationToken);
+            var select = new SelectElement(element);
+            select.SelectByText(text);
+            return new SuccessOnWebAction
+            {
+                WebElement = element
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ErrorOnWebAction
+            {
+                Error = ex.Message
+            };
+        }
+    }
+
     private async Task StringPress(IWebElement element, string text, CancellationToken token)
     {
         var actions = new Actions(_webDriver);
