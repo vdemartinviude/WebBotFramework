@@ -16,9 +16,9 @@ public class GenericMediatedParameters
     public GenericWebElement ByOrElement { get; set; }
 }
 
-public class GenericWebElement : OneOfBase<By, WebElement, RecursiveElement, ElementFromSearchContext>
+public class GenericWebElement : OneOfBase<By, WebElement, RecursiveElement, ElementFromSearchContext, List<WebElement>>
 {
-    public GenericWebElement(OneOf<By, WebElement, RecursiveElement, ElementFromSearchContext> input) : base(input)
+    public GenericWebElement(OneOf<By, WebElement, RecursiveElement, ElementFromSearchContext, List<WebElement>> input) : base(input)
     {
     }
 

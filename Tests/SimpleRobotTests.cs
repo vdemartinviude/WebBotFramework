@@ -162,6 +162,17 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
     }
 
     [Fact]
+    public async Task AssureRobotCanSelect()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        await robotFixtures.Robot.Execute(new MediatedSelectRequest
+        {
+            BaseParameters = new() { ByOrElement = new GenericWebElement(By.XPath("")) },
+            KindOfSelect = KindOfSelect.SelectByDrive
+        }, token);
+    }
+
+    [Fact]
     public async Task AssureRobotCanClickShadowDom()
     {
         var token = robotFixtures.TokenSource.Token;
@@ -182,12 +193,11 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
             BaseParameters = new() { ByOrElement = new GenericWebElement(By.XPath("//enel-login-welcome")), DelayAfter = TimeSpan.FromSeconds(5) }
         }, token);
 
-        var click = await robotFixtures.Robot.Execute(new MediatedClickRequest
+        await robotFixtures.Robot.Execute(new MediatedClickRequest
         {
             BaseParameters = new()
             {
-                ByOrElement =
-                                                      new GenericWebElement(new ElementFromSearchContext { SearchContext = shadow.AsT1.SearchContext, CssSelector = "enel-button" })
+                ByOrElement = new GenericWebElement(new ElementFromSearchContext { SearchContext = shadow.AsT1.SearchContext, CssSelector = "enel-button" })
             }
         }, token);
         Assert.True(shadow.IsT1);

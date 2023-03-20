@@ -16,15 +16,12 @@ public enum MachineEvents
 
 public interface IGuard<TCurrentState, TNextState> where TCurrentState : BaseState where TNextState : BaseState
 {
-    public abstract bool Condition(Robot robot);
+    public abstract bool Condition(Robot robot, CancellationToken token);
 
     public abstract uint Priority { get; }
-    public const uint RobotPhase = 1;
 }
 
 public interface IGuard<TFinalState> where TFinalState : BaseState
 {
-    public abstract bool Condition(Robot robot);
-
-    public const uint RobotPhase = 1;
+    public abstract bool Condition(Robot robot, CancellationToken token);
 }

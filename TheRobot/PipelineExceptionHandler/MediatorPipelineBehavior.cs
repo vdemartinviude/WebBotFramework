@@ -25,9 +25,8 @@ public class MediatorPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<T
     {
         try
         {
-            _logger.LogInformation("Starting handling the following request {@request}", request);
+            _logger.LogInformation("Executing: {@request}", request);
             var response = await next();
-            _logger.LogInformation("Fineshed handling the request {@request} with the response: {@response}", request, response);
             return response;
         }
         catch (Exception ex)

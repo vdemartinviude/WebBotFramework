@@ -244,6 +244,25 @@ public class WebDriverService : IDisposable
         }
     }
 
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> GetElements(TimeSpan timeout, GenericWebElement byOrElement, CancellationToken cancellation)
+    {
+        try
+        {
+            var elements = await GetWebElements(timeout, byOrElement, cancellation);
+            return new SuccessOnWebAction
+            {
+                WebElements = elements
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ErrorOnWebAction
+            {
+                Error = ex.Message
+            };
+        }
+    }
+
     private async Task StringPress(IWebElement element, string text, CancellationToken token)
     {
         var actions = new Actions(_webDriver);
@@ -267,8 +286,20 @@ public class WebDriverService : IDisposable
             GenElement.Match<IWebElement>(by => wait.Until(drv => drv.FindElement(by)),
                                   element => element,
                                   recursive => recursive.Element.FindElement(recursive.By),
-                                  search => search.SearchContext.FindElement(By.CssSelector(search.CssSelector))
+                                  search => search.SearchContext.FindElement(By.CssSelector(search.CssSelector)),
+                                  elementList => elementList.First()
                                   ), token);
+    }
+
+    private async Task<IEnumerable<IWebElement>> GetWebElements(TimeSpan timeout, GenericWebElement GenElement, CancellationToken token)
+    {
+        var wait = new WebDriverWait(_webDriver, timeout);
+        return await Task.Run(() =>
+            GenElement.Match<IEnumerable<IWebElement>>(by => wait.Until(drv => drv.FindElements(by)),
+                                                       element => null,
+                                                       recursive => recursive.Element.FindElements(recursive.By),
+                                                       search => search.SearchContext.FindElements(By.CssSelector(search.CssSelector)),
+                                                       elementList => elementList), token);
     }
 
     public void Dispose()
