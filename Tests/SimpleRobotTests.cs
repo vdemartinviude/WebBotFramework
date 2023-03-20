@@ -185,6 +185,25 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
     }
 
     [Fact]
+    public async Task AssureRobotCanUpoloadFile()
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = pageFilePath,
+        }, token);
+
+        var res = await robotFixtures.Robot.Execute(new MediatedUploadFileBySelectRequest
+        {
+            BaseParameters = new() { ByOrElement = new(By.Id("myFile")) },
+            FilePath = Path.GetFullPath(@"WebPagesForTests\Assets\Image.png")
+        }, token);
+
+        Assert.True(res.IsT1);
+    }
+
+    [Fact]
     public async Task AssureRobotCanClickShadowDom()
     {
         var token = robotFixtures.TokenSource.Token;

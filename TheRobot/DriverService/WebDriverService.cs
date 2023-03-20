@@ -349,4 +349,24 @@ public class WebDriverService : IDisposable
         _logger.LogCritical("Encerrando driver!");
         _webDriver.Quit();
     }
+
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> UploadFileBySelect(TimeSpan timeOut, GenericWebElement byOrElement, string filePath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var element = await GetWebElement(timeOut, byOrElement, cancellationToken);
+            element.SendKeys(filePath);
+            return new SuccessOnWebAction
+            {
+                WebElement = element
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ErrorOnWebAction
+            {
+                Error = ex.Message,
+            };
+        }
+    }
 }
