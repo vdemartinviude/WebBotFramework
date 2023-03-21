@@ -55,7 +55,7 @@ namespace TheStateMachine
                     ResultJsonDocument = _resultDocument}})!).ToList();
             foreach (var state in states)
             {
-                builder.In(state).ExecuteOnEntry(() => MachineExecuteState(state).Wait());
+                builder.In(state).ExecuteOnEntry(async () => await MachineExecuteState(state));
                 builder.In(state).On(MachineEvents.FinalizeMachine).Execute(() => _endMachine());
                 IntermediaryGuardsProcess(builder, states, state);
                 FinalGuardProcess(builder, state);
@@ -118,7 +118,7 @@ namespace TheStateMachine
                 builder
                     .In(currentState!)
                     .On(MachineEvents.NormalTransition)
-                    .If(() => ((Task<bool>)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot, token })!).Result)
+                    .If(async () => await ((Task<bool>)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot, token })!))
                     .Execute(() => _normalFinish());
             }
         }
@@ -140,29 +140,22 @@ namespace TheStateMachine
                 builder
                     .In(currentState!)
                     .On(MachineEvents.NormalTransition)
-                    .If(() => ((Task<bool>)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot, token })).Result)
+                    .If(async () => await ((Task<bool>)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot, token })!))
                     .Goto(nextstate);
             }
         }
 
         private async Task MachineExecuteState(BaseState state)
         {
-            AutoResetEvent autoResetEvent = new(false);
-
-            ThreadPool.RegisterWaitForSingleObject(autoResetEvent, new WaitOrTimerCallback(watchdogEventSignled), state, (int)state.StateTimeout.TotalMilliseconds, true);
-
-            TaskFactory factory = new(token);
-
+            Task[] tasks = { state.Execute(token) };
             _logger.LogWarning($"Executing the state: {state.Name}");
 
-            await state.Execute(token);
-            await Machine!.Fire(MachineEvents.NormalTransition);
-            autoResetEvent.Set();
-        }
-
-        private async void watchdogEventSignled(object? state, bool timedOut)
-        {
-            if (timedOut)
+            var completed = Task.WaitAll(tasks, (int)state.StateTimeout.TotalMilliseconds, token);
+            if (completed)
+            {
+                await Machine!.Fire(MachineEvents.NormalTransition);
+            }
+            else
             {
                 _logger.LogCritical("State {name} timeout", state!.GetType().Name);
                 cts.Cancel();
