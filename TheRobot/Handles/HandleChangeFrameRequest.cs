@@ -1,13 +1,6 @@
 ﻿using MediatR;
 using OneOf;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TheRobot.DriverService;
 using TheRobot.MediatedRequests;
 using TheRobot.Responses;

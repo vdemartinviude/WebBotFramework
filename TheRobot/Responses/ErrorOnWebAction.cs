@@ -1,6 +1,4 @@
-﻿using TheRobot.Responses;
-
-namespace TheRobot.Responses;
+﻿namespace TheRobot.Responses;
 
 public enum SeverityLevel
 {

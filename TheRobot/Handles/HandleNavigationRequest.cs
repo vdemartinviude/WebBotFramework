@@ -1,7 +1,5 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Logging;
 using OneOf;
-using System.Diagnostics;
 using TheRobot.DriverService;
 using TheRobot.MediatedRequests;
 using TheRobot.Responses;

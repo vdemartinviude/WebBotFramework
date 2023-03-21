@@ -1,6 +1,4 @@
-﻿using OpenQA.Selenium;
-
-namespace TheRobot.MediatedRequests;
+﻿namespace TheRobot.MediatedRequests;
 
 public enum KindOfClik
 {

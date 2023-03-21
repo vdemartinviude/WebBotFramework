@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TheRobot.FolderMonitorHelper;
+﻿namespace TheRobot.FolderMonitorHelper;
 
 public class FolderMonitor
 {
     private readonly FileSystemWatcher watcher;
+
     public FolderMonitor(string folderName)
     {
         watcher = new FileSystemWatcher(folderName);
-        
     }
-    public WaitForChangedResult WaitForDownloadByFileTypes(List<string> FileTypes,TimeSpan timeout)
-    {
 
+    public WaitForChangedResult WaitForDownloadByFileTypes(List<string> FileTypes, TimeSpan timeout)
+    {
         watcher.Filters.Clear();
-        
+
         FileTypes.ForEach((FileType) => watcher.Filters.Add(FileType));
-        return watcher.WaitForChanged(WatcherChangeTypes.All,(int) Math.Ceiling(timeout.TotalMilliseconds));
-       
+        return watcher.WaitForChanged(WatcherChangeTypes.All, (int)Math.Ceiling(timeout.TotalMilliseconds));
     }
 }

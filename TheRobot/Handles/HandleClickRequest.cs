@@ -1,7 +1,5 @@
 ﻿using MediatR;
 using OneOf;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using System.Diagnostics;
 using TheRobot.DriverService;
 using TheRobot.MediatedRequests;
