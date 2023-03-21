@@ -4,6 +4,7 @@ using JsonDocumentsManager;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StatesAndEvents;
+using System.Reflection;
 using TheRobot;
 using TheStateMachine.Model;
 
@@ -54,7 +55,7 @@ namespace TheStateMachine
                     ResultJsonDocument = _resultDocument}})!).ToList();
             foreach (var state in states)
             {
-                builder.In(state).ExecuteOnEntry(() => MachineExecuteState(state));
+                builder.In(state).ExecuteOnEntry(() => MachineExecuteState(state).Wait());
                 builder.In(state).On(MachineEvents.FinalizeMachine).Execute(() => _endMachine());
                 IntermediaryGuardsProcess(builder, states, state);
                 FinalGuardProcess(builder, state);
@@ -117,7 +118,7 @@ namespace TheStateMachine
                 builder
                     .In(currentState!)
                     .On(MachineEvents.NormalTransition)
-                    .If(() => (bool)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot })!)
+                    .If(() => ((Task<bool>)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot, token })!).Result)
                     .Execute(() => _normalFinish());
             }
         }
@@ -139,7 +140,7 @@ namespace TheStateMachine
                 builder
                     .In(currentState!)
                     .On(MachineEvents.NormalTransition)
-                    .If(() => (bool)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot })!)
+                    .If(() => ((Task<bool>)guard.Guard!.GetMethod("Condition")!.Invoke(guard.TheGuard, new object[] { _robot, token })).Result)
                     .Goto(nextstate);
             }
         }
@@ -154,7 +155,6 @@ namespace TheStateMachine
 
             _logger.LogWarning($"Executing the state: {state.Name}");
 
-            //var task = factory.StartNew(async () => await state.Execute(token));
             await state.Execute(token);
             await Machine!.Fire(MachineEvents.NormalTransition);
             autoResetEvent.Set();
