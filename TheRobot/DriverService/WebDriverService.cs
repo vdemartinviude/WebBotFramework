@@ -369,4 +369,43 @@ public class WebDriverService : IDisposable
             };
         }
     }
+
+    public async Task<OneOf<ErrorOnWebAction, SuccessOnWebAction>> WaitExistOrVanish(TimeSpan timeOut, GenericWebElement byOrElement, bool? waitForVanish, CancellationToken cancellationToken)
+    {
+        var mytask = PoolElement(byOrElement, cancellationToken);
+        var result = await Task.WhenAny(mytask, Task.Delay(timeOut));
+        if (result == mytask)
+        {
+            return new SuccessOnWebAction
+            {
+                WebElement = ((Task<IWebElement>)result).Result
+            };
+        }
+        else
+        {
+            return new ErrorOnWebAction
+            {
+            };
+        }
+    }
+
+    private async Task<IWebElement> PoolElement(GenericWebElement element, CancellationToken token)
+    {
+        do
+        {
+            try
+            {
+                var el = await GetWebElement(TimeSpan.FromMilliseconds(100), element, token);
+                token.ThrowIfCancellationRequested();
+                return el;
+            }
+            catch (Exception ex) when (ex is WebDriverTimeoutException || ex is NoSuchElementException)
+            {
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        } while (true);
+    }
 }

@@ -203,6 +203,26 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
         Assert.True(res.IsT1);
     }
 
+    [Theory]
+    [InlineData(30, true)]
+    [InlineData(2, false)]
+    public async Task AssureRobotCanWaitElementExists(double timeout, bool success)
+    {
+        var token = robotFixtures.TokenSource.Token;
+        var pageFilePath = Path.GetFullPath(@"WebPagesForTests\IFrameTest.html");
+        await robotFixtures.Robot.Execute(new MediatedNavigationRequest
+        {
+            Url = pageFilePath,
+        }, token);
+
+        var result = await robotFixtures.Robot.Execute(new MediatedWaitElementExistOrVanish
+        {
+            BaseParameters = new() { ByOrElement = new(By.XPath("//p[contains(text(),'componente aparece')]")), TimeOut = TimeSpan.FromSeconds(timeout) }
+        }, token);
+
+        Assert.Equal(success, result.IsT1);
+    }
+
     [Fact]
     public async Task AssureRobotCanClickShadowDom()
     {

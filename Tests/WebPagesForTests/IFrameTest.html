@@ -21,5 +21,16 @@
     </form>
     <iframe id="myiframe" src="IFrame.html">
     </iframe>
+    <section name="placeholdForElement">
+    </section>
 </body>
 </html>
+<script>
+    addEventListener("load", (event) => { const myTimeout = setTimeout(createElement, 10000); });
+    function createElement() {
+        const sect = document.querySelector('section');
+        const para = document.createElement('p');
+        para.textContent = "Este componente aparece depois.....";
+        sect.appendChild(para);
+    }
+</script>
