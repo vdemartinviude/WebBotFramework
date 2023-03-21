@@ -181,6 +181,7 @@ public class WebDriverService : IDisposable
             switch (kindOfSetText)
             {
                 case KindOfSetText.SetByWebDriver:
+                    element.Clear();
                     element.SendKeys(textToSet);
                     break;
 
