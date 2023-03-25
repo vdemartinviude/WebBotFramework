@@ -3,5 +3,8 @@
     "DefaultTimeout": 5,
     "MarkdownColor": "lightgreen",
     "MarkdownEnabled": true
+  },
+  "NoSeleniumConfiguration": {
+    "EdgeWebDriverPath": "C:\\Users\\demar\\Downloads\\edgedriver_win64\\msedgedriver.exe"
   }
 }

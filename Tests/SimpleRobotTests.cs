@@ -14,6 +14,13 @@ public class SimpleRobotTests : IClassFixture<RobotAndMachineFixtures>
     }
 
     [Fact]
+    public async void AssureCanInitiateDriverNoSelenium()
+    {
+        await robotFixtures.NoSeleniumDriver.Start();
+        await robotFixtures.NoSeleniumDriver.NewSession(robotFixtures.TokenSource.Token);
+    }
+
+    [Fact]
     public void AssureThatFixturesCanBeCreated()
     {
         Assert.NotNull(robotFixtures);

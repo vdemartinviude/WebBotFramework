@@ -22,6 +22,7 @@ public class RobotAndMachineFixtures : IDisposable
     public readonly TheMachine StateMachine;
     public readonly InputJsonDocument InputJsonDocument;
     public readonly ILoggerFactory LoggerFactory;
+    public readonly IWebDriverServiceNoSeleniun NoSeleniumDriver;
 
     public RobotAndMachineFixtures()
     {
@@ -33,10 +34,18 @@ public class RobotAndMachineFixtures : IDisposable
             .ConfigureAppConfiguration(x => x.AddJsonFile(@"Configuration\RobotConfiguration.json"))
             .ConfigureServices(services =>
             {
+                services.AddHttpClient<IWebDriverServiceNoSeleniun, WebDriverServiceNoSelenium>();
                 services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Load("TheRobot")));
                 services.AddTransient(typeof(IPipelineBehavior<,>), typeof(MediatorPipelineBehavior<,>));
                 services.AddSingleton<WebDriverService>();
                 services.AddSingleton(x => new InputJsonDocument("InputDataForTests\\InputJson.json"));
+                services.AddSingleton<IWebDriverServiceNoSeleniun>(provider =>
+                {
+                    var configuration = provider.GetRequiredService<IConfiguration>();
+                    var browser = KindOfBrowser.Edge;
+                    var httpClient = provider.GetRequiredService<HttpClient>();
+                    return new WebDriverServiceNoSelenium(browser, configuration, httpClient);
+                });
             })
             .UseSerilog()
             .Build();
@@ -52,10 +61,12 @@ public class RobotAndMachineFixtures : IDisposable
             host.Services.GetRequiredService<ILoggerFactory>());
         TokenSource = new();
         InputJsonDocument = host.Services.GetRequiredService<InputJsonDocument>();
+        NoSeleniumDriver = host.Services.GetRequiredService<IWebDriverServiceNoSeleniun>();
     }
 
     public void Dispose()
     {
         Robot.Dispose();
+        NoSeleniumDriver.Dispose();
     }
 }
